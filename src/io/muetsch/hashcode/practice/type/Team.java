@@ -1,9 +1,6 @@
 package io.muetsch.hashcode.practice.type;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Team {
@@ -13,6 +10,9 @@ public class Team {
 
     private int hashCodeCache;
     private boolean hashCodeDirty = true;
+
+    private Set<String> ingredientsCache = new HashSet<>();
+    private boolean ingredientsDirty = true;
 
     public Team(long id, int members) {
         this.id = id;
@@ -36,7 +36,7 @@ public class Team {
     }
 
     public List<Pizza> getPizzas() {
-        return pizzas;
+        return pizzas.stream().collect(Collectors.toUnmodifiableList());
     }
 
     public void setPizzas(List<Pizza> pizzas) {
@@ -58,9 +58,13 @@ public class Team {
     }
 
     public Set<String> getIngredients() {
-        return pizzas.stream()
-                .flatMap(p -> p.getIngredients().stream())
-                .collect(Collectors.toUnmodifiableSet());
+        if (ingredientsDirty) {
+            ingredientsCache = pizzas.stream()
+                    .flatMap(p -> p.getIngredients().stream())
+                    .collect(Collectors.toUnmodifiableSet());
+            ingredientsDirty = false;
+        }
+        return ingredientsCache;
     }
 
     public double getScore() {
@@ -69,6 +73,7 @@ public class Team {
 
     private void setDirty() {
         hashCodeDirty = true;
+        ingredientsDirty = true;
     }
 
     @Override
@@ -84,7 +89,7 @@ public class Team {
     @Override
     public int hashCode() {
         if (hashCodeDirty) {
-            hashCodeCache = Objects.hash(id, members, pizzas);
+            hashCodeCache = Objects.hash(id, members, pizzas.size());
             hashCodeDirty = false;
         }
         return hashCodeCache;

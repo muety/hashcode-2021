@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class GreedySolver implements Solver {
-    private Config config;
+    private final Config config;
 
     public GreedySolver(Config config) {
         this.config = config;
@@ -68,8 +68,9 @@ public class GreedySolver implements Solver {
     private Optional<Pizza> findBestCandidate(Team teamWithPizzas, List<Pizza> pizzas) {
         assert teamWithPizzas.doesGetPizza();
         return pizzas.parallelStream()
+                .unordered()
                 .filter(p -> !p.isDelivered())
-                .max(Comparator.comparing(p -> p.diffLenWith(teamWithPizzas)));
+                .max(Comparator.comparing(p -> p.diffLenWith(teamWithPizzas.getIngredients())));
     }
 
     public static class Config {
