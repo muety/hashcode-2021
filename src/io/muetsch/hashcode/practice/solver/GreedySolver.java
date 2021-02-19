@@ -11,13 +11,26 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class GreedySolver implements Solver {
+    private Config config;
+
+    public GreedySolver(Config config) {
+        this.config = config;
+    }
+
     @Override
     public void solve(Problem problem) {
+        var pizzaSorter = Comparator.comparing(Pizza::getNumIngredients);
+        var teamSorter = Comparator.comparing(Team::getMembers);
+
+        if (config.largePizzasFirst) pizzaSorter = pizzaSorter.reversed();
+        if (config.largeTeamsFirst) teamSorter = teamSorter.reversed();
+
         final var pizzas = problem.getPizzas().stream()
-                .sorted(Comparator.comparing(Pizza::getNumIngredients))
+                .sorted(pizzaSorter)
                 .collect(Collectors.toCollection(LinkedList::new));
+
         final var teams = problem.getTeams().stream()
-                .sorted(Comparator.comparing(Team::getMembers))
+                .sorted(teamSorter)
                 .collect(Collectors.toUnmodifiableList());
 
         int i = 0;
@@ -30,6 +43,7 @@ public class GreedySolver implements Solver {
             if (!pizzas.isEmpty()) {
                 final var firstPizza = pizzas.remove();
                 t.addPizza(firstPizza);
+                firstPizza.setDelivered(true);
 
                 while (!t.isValid()) {
                     final var nextPizza = findBestCandidate(t, pizzas);
@@ -42,12 +56,11 @@ public class GreedySolver implements Solver {
                             () -> {
                                 // Team can't be satisfied, roll back and deliver nothing
                                 t.setPizzas(List.of());
+                                firstPizza.setDelivered(false);
                                 pizzas.push(firstPizza);
                             }
                     );
                 }
-
-                firstPizza.setDelivered(true);
             }
         }
     }
@@ -56,6 +69,16 @@ public class GreedySolver implements Solver {
         assert teamWithPizzas.doesGetPizza();
         return pizzas.parallelStream()
                 .filter(p -> !p.isDelivered())
-                .max(Comparator.comparing(p -> p.diffLenWith(teamWithPizzas.getIngredients())));
+                .max(Comparator.comparing(p -> p.diffLenWith(teamWithPizzas)));
+    }
+
+    public static class Config {
+        public Config(boolean largeTeamsFirst, boolean largePizzasFirst) {
+            this.largeTeamsFirst = largeTeamsFirst;
+            this.largePizzasFirst = largePizzasFirst;
+        }
+
+        public boolean largeTeamsFirst;
+        public boolean largePizzasFirst;
     }
 }

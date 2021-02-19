@@ -1,18 +1,26 @@
 package io.muetsch.hashcode.practice;
 
-import io.muetsch.hashcode.practice.type.Problem;
 import io.muetsch.hashcode.practice.type.Pizza;
+import io.muetsch.hashcode.practice.type.Problem;
 import io.muetsch.hashcode.practice.type.Team;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class ProblemParser {
     private int pos;
-    private final Problem result = new Problem();
+    private Problem result = new Problem();
+    private List<String> lines = new LinkedList<>();
 
     public void feedLine(String line) {
+        lines.add(line);
+        processLine(line);
+    }
+
+    private void processLine(String line) {
         if (pos == 0) {
             // Parse first meta data line
             final var nums = Arrays.stream(line.split(" "))
@@ -48,6 +56,15 @@ public class ProblemParser {
 
     public Problem get() {
         return result;
+    }
+
+    public ProblemParser replayed() {
+        assert !lines.isEmpty();
+
+        pos = 0;
+        result = new Problem();
+        lines.forEach(this::processLine);
+        return this;
     }
 
 }
