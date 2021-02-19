@@ -4,16 +4,16 @@ import io.muetsch.hashcode.practice.type.Pizza;
 import io.muetsch.hashcode.practice.type.Problem;
 import io.muetsch.hashcode.practice.type.Team;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class ProblemParser {
     private int pos;
+    private int ingredientSeq;
     private Problem result = new Problem();
     private List<String> lines = new LinkedList<>();
+    private Map<String, Integer> ingredientMap = new HashMap<>();
 
     public void feedLine(String line) {
         lines.add(line);
@@ -45,9 +45,15 @@ public class ProblemParser {
                     .forEach(result::addTeam);
         } else {
             // Parse pizza definition
-            final var ingredients = Arrays.stream(line.split(" "))
-                    .skip(1)
-                    .collect(Collectors.toUnmodifiableSet());
+            final var ingredients = new LinkedHashSet<Integer>();
+            final var split = line.split(" ");
+
+            for (int i = 1; i < split.length; i++) {
+                final var ingredient = ingredientMap.getOrDefault(split[i], ingredientSeq++);
+                ingredientMap.put(split[i], ingredient);
+                ingredients.add(ingredient);
+            }
+
             result.addPizza(new Pizza(pos - 1, ingredients));
         }
 

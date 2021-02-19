@@ -6,9 +6,9 @@ import java.util.stream.Stream;
 public class Pizza {
     private long id;
     private boolean delivered;
-    private Set<String> ingredients;
+    private Set<Integer> ingredients;
 
-    public Pizza(long id, Set<String> ingredients) {
+    public Pizza(long id, Set<Integer> ingredients) {
         this.id = id;
         this.ingredients = ingredients;
     }
@@ -21,11 +21,11 @@ public class Pizza {
         this.id = id;
     }
 
-    public Set<String> getIngredients() {
+    public Set<Integer> getIngredients() {
         return ingredients;
     }
 
-    public void setIngredients(Set<String> ingredients) {
+    public void setIngredients(Set<Integer> ingredients) {
         this.ingredients = ingredients;
     }
 
@@ -41,7 +41,7 @@ public class Pizza {
         return ingredients.size();
     }
 
-    public long diffLenWith(Set<String> ingredients) {
+    public long diffLenWith(Set<Integer> ingredients) {
         return Stream.concat(this.ingredients.stream(), ingredients.stream())
                 .unordered()
                 .distinct()

@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class GreedySolver implements Solver {
-    private final Config config;
+    private Config config;
 
     public GreedySolver(Config config) {
         this.config = config;
