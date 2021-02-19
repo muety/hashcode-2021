@@ -1,7 +1,8 @@
 package io.muetsch.hashcode.practice.type;
 
-import io.muetsch.hashcode.practice.util.LRUCache;
-
+import java.lang.ref.SoftReference;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -11,7 +12,7 @@ public class Pizza {
     private boolean delivered;
     private Set<String> ingredients;
 
-    private final LRUCache diffCache = new LRUCache(2 << 5);
+    private final Map<Integer, SoftReference<Long>> diffCache = new HashMap<>();
 
     public Pizza(long id, Set<String> ingredients) {
         this.id = id;
@@ -48,15 +49,17 @@ public class Pizza {
 
     public long diffLenWith(Team needyTeam) {
         final var hc = needyTeam.hashCode();
-        if (diffCache.get(hc) != -1L) {
-            return diffCache.get(hc);
+        if (diffCache.containsKey(hc)) {
+            final var l = diffCache.get(hc).get();
+            if (l != null) return l;
+            diffCache.remove(hc);
         }
 
         final var count = Stream.concat(this.ingredients.stream(), needyTeam.getIngredients().stream())
                 .distinct()
                 .count();
 
-        diffCache.put(hc, count);
+        diffCache.put(hc, new SoftReference<>(count));
         return count;
     }
 

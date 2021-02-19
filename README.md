@@ -4,6 +4,7 @@ Solutions for Google Hash Code 2021 Practice- and Qualification rounds.
 
 ## Requirements
 * JDK 15
+* `-Xms512m -Xmx8192m -XX:SoftRefLRUPolicyMSPerMB=10000`
 
 Input files are read from `stdin`.
 
