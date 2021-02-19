@@ -14,4 +14,8 @@ Input files are read from `stdin`.
 
 | Dataset | Score |
 | --- | --- |
-| | |
+| A | 61 |
+| B | 8,337 |
+| C | 705,175,142 |
+| D | 7,747,922 |
+| E | 10,674,218 |
