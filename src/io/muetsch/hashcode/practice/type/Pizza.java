@@ -1,14 +1,18 @@
 package io.muetsch.hashcode.practice.type;
 
-import java.util.Set;
-import java.util.stream.Stream;
+import java.util.BitSet;
+import java.util.Objects;
 
 public class Pizza {
     private long id;
     private boolean delivered;
-    private Set<Integer> ingredients;
+    private BitSet ingredients;
 
-    public Pizza(long id, Set<Integer> ingredients) {
+    public Pizza(long id) {
+        this.id = id;
+    }
+
+    public Pizza(long id, BitSet ingredients) {
         this.id = id;
         this.ingredients = ingredients;
     }
@@ -21,11 +25,11 @@ public class Pizza {
         this.id = id;
     }
 
-    public Set<Integer> getIngredients() {
+    public BitSet getIngredients() {
         return ingredients;
     }
 
-    public void setIngredients(Set<Integer> ingredients) {
+    public void setIngredients(BitSet ingredients) {
         this.ingredients = ingredients;
     }
 
@@ -38,13 +42,26 @@ public class Pizza {
     }
 
     public int getNumIngredients() {
-        return ingredients.size();
+        return ingredients.cardinality();
     }
 
-    public long diffLenWith(Set<Integer> ingredients) {
-        return Stream.concat(this.ingredients.stream(), ingredients.stream())
-                .unordered()
-                .distinct()
-                .count();
+    public long diffLenWith(BitSet ingredients) {
+        final var intersect = new BitSet(this.ingredients.size());
+        intersect.or(this.ingredients);
+        intersect.or(ingredients);
+        return intersect.cardinality();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Pizza pizza = (Pizza) o;
+        return id == pizza.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

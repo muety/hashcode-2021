@@ -5,15 +5,17 @@ import io.muetsch.hashcode.practice.type.Problem;
 import io.muetsch.hashcode.practice.type.Team;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class ProblemParser {
     private int pos;
-    private int ingredientSeq;
     private Problem result = new Problem();
     private List<String> lines = new LinkedList<>();
-    private Map<String, Integer> ingredientMap = new HashMap<>();
+    private Map<Pizza, Set<String>> pizzaIngredients = new ConcurrentHashMap<>();
 
     public void feedLine(String line) {
         lines.add(line);
@@ -45,32 +47,53 @@ public class ProblemParser {
                     .forEach(result::addTeam);
         } else {
             // Parse pizza definition
-            final var ingredients = new LinkedHashSet<Integer>();
-            final var split = line.split(" ");
-
-            for (int i = 1; i < split.length; i++) {
-                final var ingredient = ingredientMap.getOrDefault(split[i], ingredientSeq++);
-                ingredientMap.put(split[i], ingredient);
-                ingredients.add(ingredient);
-            }
-
-            result.addPizza(new Pizza(pos - 1, ingredients));
+            final var pizza = new Pizza(pos - 1);
+            final var ingredients = Arrays.stream(line.split(" "))
+                    .skip(1)
+                    .collect(Collectors.toUnmodifiableSet());
+            pizzaIngredients.put(pizza, ingredients);
+            result.addPizza(pizza);
         }
 
         pos++;
     }
 
     public Problem get() {
+        postprocess();
         return result;
     }
 
     public ProblemParser replayed() {
         assert !lines.isEmpty();
 
-        pos = 0;
-        result = new Problem();
+        reset();
         lines.forEach(this::processLine);
         return this;
     }
 
+    private void reset() {
+        pos = 0;
+        result = new Problem();
+        pizzaIngredients.clear();
+    }
+
+    private void postprocess() {
+        final var idx = new AtomicInteger();
+        final var ingredientIdxMap = pizzaIngredients.values().stream()
+                .flatMap(Collection::stream)
+                .unordered()
+                .distinct()
+                .collect(Collectors.toMap(Function.identity(), s -> idx.getAndIncrement()));
+
+        result.getPizzas().stream()
+                .unordered()
+                .parallel()
+                .forEach(p -> {
+                    final var ingredients = new BitSet(idx.get() + 1);
+                    pizzaIngredients.get(p).forEach(ing -> ingredients.set(ingredientIdxMap.get(ing)));
+                    p.setIngredients(ingredients);
+                });
+
+        Team.totalIngredients = idx.get() + 1;
+    }
 }

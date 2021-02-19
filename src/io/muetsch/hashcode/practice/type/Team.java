@@ -1,18 +1,15 @@
 package io.muetsch.hashcode.practice.type;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.BitSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class Team {
+    public static int totalIngredients; // a bit hacky, but works
+
     private long id;
     private int members;
     private List<Pizza> pizzas = new ArrayList<>();
-
-    private Set<Integer> ingredientsCache = new HashSet<>();
-    private boolean ingredientsDirty = true;
 
     public Team(long id, int members) {
         this.id = id;
@@ -36,16 +33,14 @@ public class Team {
     }
 
     public List<Pizza> getPizzas() {
-        return pizzas.stream().collect(Collectors.toUnmodifiableList());
+        return pizzas;
     }
 
     public void setPizzas(List<Pizza> pizzas) {
-        setDirty();
         this.pizzas = pizzas;
     }
 
     public void addPizza(Pizza pizza) {
-        setDirty();
         pizzas.add(pizza);
     }
 
@@ -57,21 +52,13 @@ public class Team {
         return pizzas.size() == members;
     }
 
-    public Set<Integer> getIngredients() {
-        if (ingredientsDirty) {
-            ingredientsCache = pizzas.stream()
-                    .flatMap(p -> p.getIngredients().stream())
-                    .collect(Collectors.toUnmodifiableSet());
-            ingredientsDirty = false;
-        }
-        return ingredientsCache;
+    public BitSet getIngredients() {
+        final var combined = new BitSet(totalIngredients);
+        pizzas.forEach(p -> combined.or(p.getIngredients()));
+        return combined;
     }
 
     public double getScore() {
-        return Math.pow(getIngredients().size(), 2);
-    }
-
-    private void setDirty() {
-        ingredientsDirty = true;
+        return Math.pow(getIngredients().cardinality(), 2);
     }
 }
