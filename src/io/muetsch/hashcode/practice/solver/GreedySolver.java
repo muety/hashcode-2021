@@ -55,9 +55,11 @@ public class GreedySolver implements Solver {
                             },
                             () -> {
                                 // Team can't be satisfied, roll back and deliver nothing
+                                t.getPizzas().forEach(p -> {
+                                    p.setDelivered(false);
+                                    pizzas.push(p);
+                                });
                                 t.setPizzas(List.of());
-                                firstPizza.setDelivered(false);
-                                pizzas.push(firstPizza);
                             }
                     );
                 }
