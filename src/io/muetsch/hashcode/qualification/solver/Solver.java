@@ -1,9 +1,9 @@
 package io.muetsch.hashcode.qualification.solver;
 
-import io.muetsch.hashcode.qualification.type.Simulation;
+import io.muetsch.hashcode.qualification.type.Problem;
 
 public interface Solver {
 
-  void solve(Simulation simulation);
+  void solve(Problem simulation);
 
 }

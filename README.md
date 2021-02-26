@@ -19,3 +19,17 @@ Input files are read from `stdin`.
 | D | 7,747,922 | 52.14 seconds |
 | E | 10,674,218 | 57.99 seconds |
 | **Total** | **723,876,626** | **–** |
+
+## Qualification Round
+* **Problem statement:** [Link](https://github.com/edgeboyo/hashCode2021/blob/master/hashcode_2021_online_qualifications.pdf)
+* **Approach:** For the qualification round, we unfortunately did not get beyond the most trivial approach. Every schedule is a uniform distribution with the only optimization being that unused streets are skipped.
+
+| Dataset | Score | Time |
+| --- | --- | --- |
+| A | 2002 | 0.01 seconds |
+| B | 4,566,536 | 0.05 seconds |
+| C | 1,298,772 | 0.14 seconds |
+| D | 1,036,060 | 0.27 seconds |
+| E | 684,007 | 0.04 seconds |
+| F | 1,238,720 | 0.12 seconds |
+| **Total** | **8,826,097** | **–** |

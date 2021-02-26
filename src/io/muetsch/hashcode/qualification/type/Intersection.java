@@ -1,21 +1,16 @@
 package io.muetsch.hashcode.qualification.type;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Intersection {
 
-  private static final int DEFAULT_DURATION = 1;
-
   private int id;
-  private Set<Street> in;
-  private Set<Street> out;
+  private final Set<Street> in;
+  private final Set<Street> out;
   private Map<Street, Integer> schedule;
 
   public Intersection(int id) {
@@ -35,8 +30,6 @@ public class Intersection {
 
   public void addIn(Street street) {
     in.add(street);
-    schedule.clear();
-    in.forEach(s -> schedule.put(s, DEFAULT_DURATION));
   }
 
   public void addOut(Street street) {

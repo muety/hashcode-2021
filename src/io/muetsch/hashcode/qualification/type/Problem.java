@@ -3,9 +3,8 @@ package io.muetsch.hashcode.qualification.type;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.w3c.dom.ls.LSOutput;
 
-public class Simulation {
+public class Problem {
 
   private boolean solved;
   private int duration;
@@ -13,7 +12,7 @@ public class Simulation {
   private Set<Intersection> intersections;
   private Set<Car> cars;
 
-  public Simulation() {
+  public Problem() {
     this.cars = new HashSet<>();
     this.intersections = new HashSet<>();
   }
@@ -60,6 +59,34 @@ public class Simulation {
 
   public long getScore() {
     return 0L;
+  }
+
+  public String summarize() {
+    final var streets = intersections.stream()
+        .flatMap(i -> i.getIn().stream())
+        .collect(Collectors.toUnmodifiableSet());
+
+    final var usedStreets = cars.stream()
+        .flatMap(i -> i.getPath().stream())
+        .collect(Collectors.toUnmodifiableSet());
+
+    return """
+        ######
+        Duration: %d
+        Reward: %d
+        # Cars: %d
+        # Intersections: %d
+        # Streets: %d (%d [%.1f %%] used)
+        ######
+        """.formatted(
+        duration,
+        reward,
+        cars.size(),
+        intersections.size(),
+        streets.size(),
+        usedStreets.size(),
+        ((float) usedStreets.size()) / ((float) streets.size()) * 100
+    );
   }
 
   @Override
